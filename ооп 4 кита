@@ -1,0 +1,94 @@
+#инкапсуляция
+-------------------------------------------------------------------------------------------------------------------
+class BankAccount:
+    def __init__(self, balance):
+        self.__balance = balance  # __ = приватный атрибут
+
+    def deposit(self, amount):    # публичный метод
+        if amount > 0:
+            self.__balance += amount
+
+    def withdraw(self, amount):
+        if 0 < amount <= self.__balance:
+            self.__balance -= amount
+
+    @property
+    def balance(self):            # безопасный доступ
+        return self.__balance
+
+acc = BankAccount(1000)
+acc.deposit(500)
+print(acc.balance)      # 1500
+print(acc.__balance)    # AttributeError! — доступ закрыт
+-------------------------------------------------------------------------------------------------------------------
+#наследование
+class Car:                        # Родительский класс
+    def __init__(self, brand, speed):
+        self.brand = brand
+        self.speed = speed
+
+    def info(self):
+        print(f"{self.brand}, макс. скорость: {self.speed} км/ч")
+
+class ElectricCar(Car):            # Дочерний класс
+    def __init__(self, brand, speed, battery):
+        super().__init__(brand, speed)  # вызов родителя
+        self.battery = battery
+
+    def charge_info(self):
+        print(f"Батарея: {self.battery} кВтч")
+
+tesla = ElectricCar("Tesla", 250, 100)
+tesla.info()         # Tesla, макс. скорость: 250 км/ч
+tesla.charge_info()  # Батарея: 100 кВтч
+-------------------------------------------------------------------------------------------------------------------
+#полиморфизм
+class Animal:
+    def make_sound(self):
+        print("Какой-то звук")
+
+class Dog(Animal):
+    def make_sound(self):          # переопределяем метод
+        print("Гав!")
+
+class Cat(Animal):
+    def make_sound(self):          # переопределяем метод
+        print("Мяу!")
+
+class Duck(Animal):
+    def make_sound(self):
+        print("Кря!")
+
+# Один цикл — работает для всех!
+animals = [Dog(), Cat(), Duck()]
+for animal in animals:
+    animal.make_sound()   # Гав! / Мяу! / Кря!
+-------------------------------------------------------------------------------------------------------------------
+#абстракция
+from abc import ABC, abstractmethod
+
+class Vehicle(ABC):               # абстрактный класс
+    @abstractmethod
+    def move(self):               # абстрактный метод
+        pass                      # реализации нет!
+
+    @abstractmethod
+    def stop(self):
+        pass
+
+class Car(Vehicle):
+    def move(self):               # обязаны реализовать!
+        print("Машина едет")
+
+    def stop(self):
+        print("Машина тормозит")
+
+class Boat(Vehicle):
+    def move(self):
+        print("Лодка плывёт")
+
+    def stop(self):
+        print("Лодка останавливается")
+
+v = Vehicle()   # TypeError! — нельзя создать абстрактный класс
+-------------------------------------------------------------------------------------------------------------------
