@@ -41,6 +41,25 @@ class ElectricCar(Car):            # Дочерний класс
 tesla = ElectricCar("Tesla", 250, 100)
 tesla.info()         # Tesla, макс. скорость: 250 км/ч
 tesla.charge_info()  # Батарея: 100 кВтч
+
+
+#переопределение методов родительского класса
+class Animal:
+    def speak(self):
+        return "Животное издаёт звук"
+
+class Dog(Animal):
+    def speak(self):  # переопределение метода speak()
+        return "Гав!"
+
+class Cat(Animal):
+    def speak(self):  # другое переопределение метода speak()
+        return "Мяу!"
+
+animals = [Animal(),Dog(), Cat()]
+for animal in animals:
+    print(animal.speak())
+
 -------------------------------------------------------------------------------------------------------------------
 #полиморфизм
 class Animal:
