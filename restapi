@@ -1,0 +1,74 @@
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+app.json.ensure_ascii = False       # читаемая кириллица в JSON
+
+tasks = [
+    {'id': 1, 'title': 'Изучить REST API', 'done': False},
+    {'id': 2, 'title': 'Написать клиента на requests', 'done': False},
+]
+next_id = 3
+
+def find_task(task_id):
+    for task in tasks:
+        if task['id'] == task_id:
+            return task
+    return None
+
+
+@app.route('/api/tasks')
+def get_tasks():                                    # READ: список
+    return jsonify(tasks)
+
+@app.route('/api/tasks/<int:task_id>')
+def get_task(task_id):                              # READ: одна задача
+    task = find_task(task_id)
+    if task is None:
+        return jsonify({'error': 'Задача не найдена'}), 404
+    return jsonify(task)
+
+
+@app.route('/api/tasks', methods=['POST'])
+def create_task():
+    global next_id
+    data = request.get_json(silent=True)
+
+    if not data or not data.get('title'):
+        return jsonify({'error': 'Нужно поле title'}), 400
+
+    task = {
+        'id': next_id,
+        'title': data['title'],
+        'done': False
+    }
+    next_id += 1
+    tasks.append(task)
+
+    return jsonify(task), 201                      # 201 — создано
+
+
+@app.route('/api/tasks/<int:task_id>', methods=['PATCH'])
+def update_task(task_id):                           # UPDATE
+    task = find_task(task_id)
+    if task is None:
+        return jsonify({'error': 'Задача не найдена'}), 404
+    data = request.get_json(silent=True) or {}
+    if 'done' in data:
+        task['done'] = bool(data['done'])
+    if data.get('title'):
+        task['title'] = data['title']
+    return jsonify(task)
+
+
+@app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):                           # DELETE
+    task = find_task(task_id)
+    if task is None:
+        return jsonify({'error': 'Задача не найдена'}), 404
+    tasks.remove(task)
+    return '', 204                                  # 204 — успех, тела нет
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
